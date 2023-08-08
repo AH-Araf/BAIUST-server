@@ -29,6 +29,10 @@ const client = new MongoClient(uri, {
 async function run(){
     try{
         const usersCollection = client.db('BAIUST').collection('users');
+        const services = client.db('BAIUST').collection('services');
+        const studentProfile = client.db('BAIUST').collection('studentProfile');
+        const applyCollection = client.db('BAIUST').collection('applyCollection');
+        
         
 
     //users
@@ -55,7 +59,94 @@ async function run(){
         const review = await cursor.toArray();
         res.send(review);
     });
+
+    //add services and get services
+    app.post('/services', async (req, res) => {
+        const review = req.body;
+        const c = await services.insertOne(review);
+        res.send(c);
+    });
+    app.get('/services', async (req, res) => {
+        let query = {};
+        const cursor = services.find(query).limit(0).sort({$natural:-1});
+        const a = await cursor.toArray();
+        res.send(a); 
+    });
+    app.get('/services/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const b = await services.findOne(query);
+        res.send(b);
+    });
+    app.get('/servicess', async (req, res) => {
+        let query = {};
+
+        if (req.query.category) {
+            query = {
+                category: req.query.category
+            }
+        }
+        const cursor = services.find(query).sort({$natural:-1});
+        const review = await cursor.toArray();
+        res.send(review);
+    });
+
+    //service apply
+        //Apply from ServiceCollection
+        app.get('/apply/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const b = await services.findOne(query);
+            res.send(b);
+        });
     
+        //Applied in appplyCollection
+        app.post('/apply', async (req, res) => {
+            const user = req.body;
+            const result = await applyCollection.insertOne(user);
+            res.send(result);
+        });
+        app.get('/apply', async (req, res) => {
+            let query = {};
+            const cursor = applyCollection.find(query);
+            const a = await cursor.toArray();
+            res.send(a);
+        });
+
+   
+
+    
+    //studentProfile
+app.post('/studentProfile', async (req, res) => {
+    const user = req.body;
+    const result = await studentProfile.insertOne(user);
+    res.send(result);
+});
+app.get('/studentProfile', async (req, res) => {
+    let query = {};
+    const cursor = studentProfile.find(query);
+    const a = await cursor.toArray();
+    res.send(a);
+});
+app.get('/studentProfileEmail', async (req, res) => {
+    let query = {};
+
+    if (req.query.stuUserEmail) {
+        query = {
+            stuUserEmail: req.query.stuUserEmail
+        }
+    }
+    const cursor = studentProfile.find(query);
+    const review = await cursor.toArray();
+    res.send(review);
+});
+
+app.delete('/studentProfileDelete/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await studentProfile.deleteOne(query);
+    res.send(result);
+})
 
     
     
