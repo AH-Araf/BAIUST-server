@@ -15,7 +15,6 @@ app.use(express.json());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.xbkhg1t.mongodb.net/?retryWrites=true&w=majority`;
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -91,6 +90,27 @@ async function run(){
         res.send(review);
     });
 
+    //service query by admin email
+    app.get('/serviceAdminEmail', async (req, res) => {
+        let query = {};
+
+        if (req.query.adminEmail) {
+            query = {
+                adminEmail: req.query.adminEmail
+            }
+        }
+        const cursor = services.find(query).sort({$natural:-1});
+        const review = await cursor.toArray();
+        res.send(review);
+    });
+
+    app.delete('/serviceDelete/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await services.deleteOne(query);
+        res.send(result);
+    })
+
     //service apply
         //Apply from ServiceCollection
         app.get('/apply/:id', async (req, res) => {
@@ -111,6 +131,47 @@ async function run(){
             const cursor = applyCollection.find(query);
             const a = await cursor.toArray();
             res.send(a);
+        });
+
+        app.get('/applyEmail', async (req, res) => {
+            let query = {};
+    
+            if (req.query.stuUserEmail) {
+                query = {
+                    stuUserEmail: req.query.stuUserEmail
+                }
+            }
+            const cursor = applyCollection.find(query).sort({$natural:-1});
+            const review = await cursor.toArray();
+            res.send(review);
+        });
+
+        app.get('/appliedCard/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const b = await applyCollection.findOne(query);
+            res.send(b);
+        });
+
+        //service id for each applicant
+        app.get('/serviceId', async (req, res) => {
+            let query = {};
+    
+            if (req.query.sId) {
+                query = {
+                    sId: req.query.sId
+                }
+            }
+            const cursor = applyCollection.find(query);
+            const review = await cursor.toArray();
+            res.send(review);
+        });
+
+        app.get('/applicant/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const b = await applyCollection.findOne(query);
+            res.send(b);
         });
 
    
