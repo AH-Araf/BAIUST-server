@@ -23,8 +23,6 @@ const client = new MongoClient(uri, {
   }
 });
 
-
-
 async function run(){
     try{
         const usersCollection = client.db('BAIUST').collection('users');
