@@ -13,7 +13,6 @@ app.use(cors());
 app.use(express.json()); 
 
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.xbkhg1t.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   serverApi: {
@@ -31,19 +30,20 @@ async function run(){
         const applyCollection = client.db('BAIUST').collection('applyCollection');
         
         
-
     //users
     app.post('/users', async (req, res) => {
         const user = req.body;
         const result = await usersCollection.insertOne(user);
         res.send(result);
     });
+    
     app.get('/users', async (req, res) => {
         let query = {};
         const cursor = usersCollection.find(query);
         const a = await cursor.toArray();
         res.send(a);
     });
+
     app.get('/email', async (req, res) => {
         let query = {};
 
@@ -57,24 +57,28 @@ async function run(){
         res.send(review);
     });
 
+    
     //add services and get services
     app.post('/services', async (req, res) => {
         const review = req.body;
         const c = await services.insertOne(review);
         res.send(c);
     });
+
     app.get('/services', async (req, res) => {
         let query = {};
         const cursor = services.find(query).limit(0).sort({$natural:-1});
         const a = await cursor.toArray();
         res.send(a); 
     });
+
     app.get('/services/:id', async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
         const b = await services.findOne(query);
         res.send(b);
     });
+
     app.get('/servicess', async (req, res) => {
         let query = {};
 
@@ -206,12 +210,6 @@ app.delete('/studentProfileDelete/:id', async (req, res) => {
     const result = await studentProfile.deleteOne(query);
     res.send(result);
 })
-
-    
-    
-
-
-
 
 
     }
